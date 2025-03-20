@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { ThemeProvider } from "next-themes";
 import ClientWrapper from "@/components/ClientWrapper";
+import { Toaster } from "@/components/ui/sonner";
 
 /* fonts used if needed  reimport them
 const openSans = Open_Sans({
@@ -65,6 +66,7 @@ export default function RootLayout({
           >
             {children}
           </ThemeProvider>
+          <Toaster position="bottom-center" />
         </body>
       </html>
     </ClientWrapper>

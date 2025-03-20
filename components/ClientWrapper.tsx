@@ -10,7 +10,7 @@ export default function ClientWrapper({
   children: React.ReactNode;
 }>) {
   const schematicPublicKey = process.env.NEXT_PUBLIC_SCHEMATIC_PUBLISHABLE_KEY;
-  console.log(schematicPublicKey);
+
   if (!schematicPublicKey) {
     throw new Error("Missing SCHEMATIC_PUBLISHABLE_KEY environment variable");
   }

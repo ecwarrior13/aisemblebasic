@@ -1,14 +1,13 @@
+import { getAuthenticatedUser } from "@/action/users";
 import LandingPage from "@/components/layout/LandingPage";
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const { userId } = await auth();
+  const user = await getAuthenticatedUser();
 
-  /*
-  if (userId) {
+  if (user) {
     redirect("/dashboard");
   }
-*/
+
   return <LandingPage />;
 }
