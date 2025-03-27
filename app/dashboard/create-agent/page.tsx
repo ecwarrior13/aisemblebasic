@@ -1,7 +1,13 @@
+"use client";
+import CreateAgent from "@/components/CreateAgent";
 import React from "react";
 
-function CreateAgent() {
-  return <div>CreateAgent</div>;
+function page() {
+  return (
+    <div>
+      <CreateAgent />
+    </div>
+  );
 }
 
-export default CreateAgent;
+export default page;

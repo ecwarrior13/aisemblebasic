@@ -11,6 +11,7 @@ import {
 } from "../ui/sidebar";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
+import { DynamicNavMain } from "./dynamicNavMain";
 
 interface DashboardSidebarProps extends React.ComponentProps<typeof Sidebar> {
   isCollapsed: boolean;
@@ -33,7 +34,7 @@ export function DashboardSidebar({
       </SidebarHeader>
 
       <SidebarContent className="bg-secondary/20">
-        <NavMain items={sideBarMenuItems.navMain} />
+        <DynamicNavMain items={sideBarMenuItems.navMain} />
       </SidebarContent>
       <SidebarFooter className="bg-secondary/20">
         <NavUser />
