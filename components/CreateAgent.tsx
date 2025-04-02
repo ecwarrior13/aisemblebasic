@@ -24,16 +24,20 @@ import { Slider } from "@/components/ui/slider";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 function CreateAgent() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [temperature, setTemperature] = useState(0.7);
-  const [selectedModel, setSelectedModel] = useState("gpt-4o");
+  const [selectedModel, setSelectedModel] = useState(
+    "jn7avtfkf0p8c1y997b5dw1p5x7d2ktj"
+  );
 
   const createAgentMutation = useMutation(api.agent.createAgent);
+  const aiModelList = useQuery(api.aiModels.getAiModels);
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
@@ -61,7 +65,7 @@ function CreateAgent() {
       const result = await createAgentMutation({
         name: formData.get("name") as string,
         description: formData.get("description") as string,
-        modelId: formData.get("modelId") as string,
+        modelId: formData.get("modelId") as Id<"aiModels">,
         systemPrompt: formData.get("systemPrompt") as string,
         configuration: {
           temperature: temperature,
@@ -133,17 +137,19 @@ function CreateAgent() {
                   <SelectValue placeholder="Select a model" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-                  <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                  <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                  <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
-                  <SelectItem value="claude-3-sonnet">
-                    Claude 3 Sonnet
-                  </SelectItem>
+                  {aiModelList?.map((model) => (
+                    <SelectItem key={model.apiModelName} value={model._id}>
+                      {model.name}
+                      {model.premium && (
+                        <span className="ml-2 text-xs text-amber-500">
+                          Premium
+                        </span>
+                      )}
+                    </SelectItem>
+                  )) || []}
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="systemPrompt">System Prompt</Label>
               <Textarea

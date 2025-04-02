@@ -39,22 +39,25 @@ export default function EditAgentForm({
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [temperature, setTemperature] = useState(0.7);
-  const [selectedModel, setSelectedModel] = useState("gpt-4o");
+  const [selectedModel, setSelectedModel] = useState(
+    "jn7avtfkf0p8c1y997b5dw1p5x7d2ktj"
+  );
 
   // Convert string ID to Convex ID
   const typedAgentId = agentId as Id<"agents">;
-  console.log("Typed agent ID:", typedAgentId);
 
   // Fetch the agent data
   const agent = useQuery(api.agent.getAgentById, { id: typedAgentId });
-  console.log("Agent data:", agent);
+
+  // Fetch the AI model list
+  const aiModelList = useQuery(api.aiModels.getAiModels);
   // Get the update mutation
   const updateAgentMutation = useMutation(api.agent.updateAgent);
 
   // Update form values when agent data is loaded
   useEffect(() => {
     if (agent) {
-      setSelectedModel(agent.modelId || "gpt-4o");
+      setSelectedModel(agent.modelId);
       setTemperature(agent.configuration?.temperature || 0.7);
     }
   }, [agent]);
@@ -67,7 +70,7 @@ export default function EditAgentForm({
         id: typedAgentId,
         name: formData.get("name") as string,
         description: formData.get("description") as string,
-        modelId: formData.get("modelId") as string,
+        modelId: formData.get("modelId") as Id<"aiModels">,
         systemPrompt: formData.get("systemPrompt") as string,
         configuration: {
           temperature: temperature,
@@ -139,7 +142,7 @@ export default function EditAgentForm({
                 defaultValue={agent.description || ""}
               />
             </div>
-
+            {/*
             <div className="space-y-2">
               <Label htmlFor="modelId">AI Model</Label>
               <Select
@@ -161,7 +164,31 @@ export default function EditAgentForm({
                 </SelectContent>
               </Select>
             </div>
-
+*/}
+            <div className="space-y-2">
+              <Label htmlFor="modelId">AI Model</Label>
+              <Select
+                name="modelId"
+                defaultValue={agent.modelId || selectedModel}
+                onValueChange={setSelectedModel}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a model" />
+                </SelectTrigger>
+                <SelectContent>
+                  {aiModelList!.map((model) => (
+                    <SelectItem key={model.apiModelName} value={model._id}>
+                      {model.name}
+                      {model.premium && (
+                        <span className="ml-2 text-xs text-amber-500">
+                          Premium
+                        </span>
+                      )}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="systemPrompt">System Prompt</Label>
               <Textarea

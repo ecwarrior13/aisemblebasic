@@ -16,20 +16,24 @@ export default async function DashboardLayout({
     redirect("/sign-in");
   }
 
-  return (
-    <div className="flex h-screen">
-      <SidebarProvider>
+   return (
+    <div className="flex h-screen overflow-hidden">
+      <SidebarProvider defaultOpen={false}>
         <DashboardSidebar isCollapsed={false} />
 
-        <div className="flex flex-col flex-1 min-h-screen">
-          <header className="flex items-center px-2 py-4 h-[50px] container bg-secondary/20">
-            <SidebarTrigger className="" />
-            <ThemeToggle />
-            <BreadcrumbHeader />
+        <div className="flex flex-col flex-1 min-h-screen overflow-hidden">
+          <header className="flex items-center px-4 py-2 h-[60px] bg-secondary/20 sticky top-0 z-10">
+            <div className="flex items-center gap-4 w-full">
+              <SidebarTrigger />
+
+              <ThemeToggle />
+
+              <BreadcrumbHeader />
+            </div>
           </header>
           <Separator />
 
-          <div className="flex-1 container py-4">{children}</div>
+          <div className="flex-1 overflow-auto py-4 px-4">{children}</div>
         </div>
       </SidebarProvider>
     </div>

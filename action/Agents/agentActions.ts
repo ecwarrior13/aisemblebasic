@@ -1,13 +1,37 @@
 "use server";
 
 import { api } from "@/convex/_generated/api";
-
-import { FeatureFlag, featureFlagEvents } from "@/features/flags";
-
 import { getConvexClient } from "@/lib/convex";
-import { client } from "@/lib/schematic";
 import { currentUser } from "@clerk/nextjs/server";
 
+
+export async function getAgentbyId() {
+    const user = await currentUser();
+    if (!user?.id) {
+        console.log("No user found");
+        throw new Error("No user found");
+    }
+    try {
+        const convex = getConvexClient();
+        const agents = await convex.query(api.agent.getAgentById, {
+            agentId
+        })
+        if (!agents) {
+            throw new Error("Agent not found");
+        }
+        return {
+            success: true,
+            agents: agents,
+        }
+
+    } catch (error) {
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Failed to fetch agents",
+            agents: [],
+        }
+    }
+}
 
 export async function fetchAgentsbyUser() {
     const user = await currentUser();
@@ -19,10 +43,12 @@ export async function fetchAgentsbyUser() {
     try {
         const convex = getConvexClient();
 
-        const agents = await convex.query(api.agent.getAllAgentsByAuthId, {
+
+
+        const agentsModel = await convex.query(api.agent.getAllAgentswithModelInfo, {
             authId: user.id
-        });
-        console.log("agents", agents.length);
+        })
+
 
         /*
         await client.track({
@@ -37,7 +63,7 @@ export async function fetchAgentsbyUser() {
         */
         return {
             success: true,
-            agents: agents,
+            agents: agentsModel,
         }
 
     } catch (error) {

@@ -20,7 +20,7 @@ export default defineSchema({
         userId: v.id("users"), // Reference to the user who created this agent
         name: v.string(), // Name of the AI agent
         description: v.optional(v.string()), // Optional description
-        modelId: v.string(), // ID of the LLM model to use (e.g., "gpt-4o", "claude-3-opus")
+        modelId: v.id("aiModels"), // ID of the LLM model to use (e.g., "gpt-4o", "claude-3-opus")
         systemPrompt: v.string(), // System prompt for the agent
         isActive: v.boolean(), // Whether the agent is active or not
         imageUrl: v.optional(v.string()), // Optional avatar for the agent
@@ -37,7 +37,9 @@ export default defineSchema({
         updatedAt: v.number(),
     })
         .index("by_userId", ["userId"]) // To find all agents created by a user
-        .index("by_active", ["isActive"]), // To find all active agents
+        .index("by_active", ["isActive"]) // To find all active agents
+        .index("by_model", ["modelId"]), // To find all agents using a specific model
+
 
     agentChats: defineTable({
         // Agent Chats table - stores chat sessions
@@ -80,6 +82,24 @@ export default defineSchema({
     })
         .index("by_chatId", ["chatId"]) // To find all messages in a chat
         .index("by_chatId_createdAt", ["chatId", "createdAt"]), // To sort messages by time
+
+    aiModels: defineTable({
+        // AI Models table - stores information about available AI models
+        name: v.string(), // Name of the model (e.g., "gpt-4o", "claude-3-opus")
+        apiModelName: v.string(), // API name of the model (e.g., "gpt-4", "claude-3")
+        provider: v.string(), // Provider of the model (e.g., "OpenAI", "Anthropic")
+        maxTokens: v.optional(v.string()), // Maximum tokens supported by the model
+        temperature: v.optional(v.string()), // Default temperature for the model
+        premium: v.boolean(), // Whether the model is premium or not
+        experimental: v.boolean(), // Whether the model is experimental or not
+        supportsStreaming: v.boolean(), // Whether the model supports streaming
+        image: v.boolean(), // Whether the model supports image generation
+        notes: v.optional(v.string()), // Optional notes about the model
+        sortOrder: v.number(), // Order for displaying models in the UI
+        createdAt: v.number(),
+        updatedAt: v.number(),
+    })
+        .index("by_sortOrder", ["sortOrder"]) // To sort models by order
 })
 
 

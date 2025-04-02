@@ -16,14 +16,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { Agent } from "@/types/dbtypes";
+import { Agent, AgentWithModel } from "@/types/dbtypes";
 import DeleteAgentDialog from "@/app/dashboard/_component/DeleteAgentDialog";
 import { useState } from "react";
 import EditAgentDialog from "@/app/dashboard/_component/EditAgentDialog";
 import { useRouter } from "next/navigation";
 
 interface AgentCardProps {
-  agent: Agent;
+  agent: AgentWithModel;
   onLaunch?: (agent: Agent) => void;
   onEdit?: (agent: Agent) => void;
   onDelete?: (agent: Agent) => void;
@@ -66,7 +66,7 @@ export default function AgentCard({ agent, onLaunch }: AgentCardProps) {
                 {agent.name}
               </CardTitle>
               <CardDescription className="text-sm text-muted-foreground mt-1">
-                {agent.modelId}
+                {agent.modelDetails?.name || "No model selected"} -{" "}
               </CardDescription>
             </div>
             <DropdownMenu>

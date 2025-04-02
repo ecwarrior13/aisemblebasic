@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import AgentCard from "@/components/Agents/AgentCard";
 import { ChevronDown } from "lucide-react";
-import { Agent } from "@/types/dbtypes";
+import { Agent, AgentWithModel } from "@/types/dbtypes";
 
 interface AgentsDisplayProps {
-  initialAgents: Agent[];
+  initialAgents: AgentWithModel[];
 }
 
 export default function AgentsDisplay({ initialAgents }: AgentsDisplayProps) {

@@ -1,3 +1,4 @@
+import { AgentWithModel } from "@/types/dbtypes";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -27,12 +28,55 @@ export const getAllAgentsByAuthId = query({
         return agents;
     },
 });
+//get all agents for a user with the aimodel information
+export const getAllAgentswithModelInfo = query({
+    args: {
+        authId: v.string(),
+    },
+    handler: async (ctx, args) => {
+        // First, get the user by authId
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_authId", (q) => q.eq("authId", args.authId))
+            .first();
+
+        if (!user) {
+            return []; // Or you could throw an error if you prefer
+        }
+
+        // Then fetch all agents for this user
+        const agents = await ctx.db
+            .query("agents")
+            .withIndex("by_userId", (q) => q.eq("userId", user._id))
+            .order("desc")
+            .collect();
+
+        // Batch fetch all the models needed
+        const modelIds = [...new Set(agents.map(agent => agent.modelId))];
+        const models = await Promise.all(
+            modelIds.map(id => ctx.db.get(id))
+        );
+
+        // Create a map of model IDs to model details
+        // Create a map of model IDs to model details
+        const modelMap = Object.fromEntries(
+            models.filter(Boolean).map(model => [model?._id, model])
+        );
+
+        // Combine agent data with model data
+        return agents.map(agent => ({
+            ...agent,
+            modelDetails: modelMap[agent.modelId] || null
+        })) as AgentWithModel[];
+    },
+});
+
 
 export const createAgent = mutation({
     args: {
         name: v.string(),
         description: v.optional(v.string()),
-        modelId: v.string(),
+        modelId: v.id("aiModels"),
         systemPrompt: v.string(),
         // Other args but NOT userAuthId
         configuration: v.optional(
@@ -137,7 +181,35 @@ export const deleteAgent = mutation({
 export const getAgentById = query({
     args: { id: v.id("agents") },
     handler: async (ctx, args) => {
-        return await ctx.db.get(args.id);
+        try {
+            const agent = await ctx.db.get(args.id);
+            //return await ctx.db.get(args.id);
+            return agent;
+        } catch (error) {
+            console.error("Error fetching agent:", error);
+            return null;
+        }
+    },
+});
+
+export const getAgentWithModel = query({
+    args: { id: v.id("agents") },
+    handler: async (ctx, args): Promise<AgentWithModel | null> => {
+        // Get the agent
+        const agent = await ctx.db.get(args.id);
+
+        if (!agent) {
+            return null;
+        }
+
+        // Get the model details
+        const modelDetails = await ctx.db.get(agent.modelId);
+
+        // Return the agent with model details
+        return {
+            ...agent,
+            modelDetails: modelDetails || null
+        };
     },
 });
 
@@ -147,7 +219,7 @@ export const updateAgent = mutation({
         id: v.id("agents"),
         name: v.string(),
         description: v.optional(v.string()),
-        modelId: v.string(),
+        modelId: v.id("aiModels"),
         systemPrompt: v.string(),
         configuration: v.object({
             temperature: v.number(),
@@ -180,6 +252,7 @@ export const debugIdentity = mutation({
             hasIdentity: !!identity,
             identityFields: identity ? Object.keys(identity) : [],
             tokenIdentifier: identity ? identity.tokenIdentifier : null,
+            subject: identity ? identity.subject : null,
         };
     }
 });
