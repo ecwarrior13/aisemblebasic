@@ -58,8 +58,8 @@ export function ChatMessages({ messages, isLoading = false }: ChatMessagesProps)
       <div className="space-y-6 pb-2">
         {messages.length === 0 && (
           <div className="text-center space-y-2">
-            <h3 className="text-lg font-medium text-primary">Welcome to the AI Agent Chat!</h3>
-            <p className="text-sm text-primary/50">Ask any question</p>
+            <h3 className="text-lg font-medium text-primary">No chats yet</h3>
+            <p className="text-sm text-primary/50">Start a new chat by clicking the New Chat button</p>
           </div>
         )}
 

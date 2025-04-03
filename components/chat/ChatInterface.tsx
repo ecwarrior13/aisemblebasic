@@ -4,10 +4,18 @@ import { Button } from "../ui/button"
 import type { AgentWithModel } from "@/types/dbtypes"
 import { ChatMessages } from "./ChatMessages"
 import { PlusCircle } from "lucide-react"
+import { ChatSelector } from "./ChatSelector"
 
 interface ChatProps {
   chatId: string
   agent: AgentWithModel
+  recentChats?: Array<{
+    _id: string
+    name?: string
+    lastMessageAt: number
+  }>
+  onSelectChat?: (chatId: string) => void
+  onNewChat?: () => void
 }
 
 function ChatInterface({ chatId, agent }: ChatProps) {
@@ -26,14 +34,7 @@ const isLoading = status === "streaming"
 
   return (
     <div className="flex flex-col h-full relative">
-      <div className="px-4 pb-3 border-b border-white flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-primary">AI Agent Chat</h2>
-        <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs bg-primary text-white" >
-          <PlusCircle className="h-3.5 w-3.5" />
-          New Chat
-        </Button>
-      </div>
-
+      <ChatSelector agentName={agent.name} />
       {/* Messages component */}
       <ChatMessages messages={messages} isLoading={isLoading} />
 
